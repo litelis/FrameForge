@@ -70,13 +70,14 @@ def check_python_version():
     print_success(f"Python {version.major}.{version.minor}.{version.micro} ✅")
     return True
 
-def check_package(package_name, install_name):
+def check_package(package_name):
     """Verifica si un paquete está instalado"""
     try:
         importlib.import_module(package_name)
         return True
     except ImportError:
         return False
+
 
 def install_package(package_spec):
     """Instala un paquete usando pip"""
