@@ -1,0 +1,35 @@
+# AI Cinematic Video Editor Pro
+# Python Dependencies
+
+# Web Framework
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+Flask-CORS==4.0.0
+
+# Data Validation
+pydantic==1.10.12
+
+# Async HTTP for Webhooks
+aiohttp==3.8.5
+asyncio==3.4.3
+
+# WebSocket Support
+python-socketio==5.8.0
+eventlet==0.33.3
+
+# Video Processing (optional - for future expansion)
+# moviepy==1.0.3
+# opencv-python==4.8.0.76
+# numpy==1.24.3
+
+# Audio Processing (optional - for future expansion)
+# SpeechRecognition==3.10.0
+# pydub==0.25.1
+
+# Utilities
+python-dotenv==1.0.0
+Werkzeug==2.3.7
+
+# Development
+pytest==7.4.0
+pytest-flask==1.2.0

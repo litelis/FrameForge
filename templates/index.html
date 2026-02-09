@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cinematic Video Editor Pro</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>AI Cinematic Editor</span>
+                <span class="pro-badge">PRO</span>
+            </div>
+            <div class="session-info" id="sessionInfo">
+                <span class="session-label">Session:</span>
+                <span class="session-id" id="sessionId">Not started</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Phase Indicator -->
+            <div class="phase-indicator" id="phaseIndicator">
+                <div class="phase-step active" data-phase="upload">
+                    <div class="phase-number">1</div>
+                    <div class="phase-label">Upload</div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" data-phase="phase1">
+                    <div class="phase-number">2</div>
+                    <div class="phase-label">Refine Prompt</div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" data-phase="phase2">
+                    <div class="phase-number">3</div>
+                    <div class="phase-label">Questions</div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" data-phase="phase3">
+                    <div class="phase-number">4</div>
+                    <div class="phase-label">Narrative</div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" data-phase="phase4">
+                    <div class="phase-number">5</div>
+                    <div class="phase-label">Scene Plan</div>
+                </div>
+                <div class="phase-connector"></div>
+                <div class="phase-step" data-phase="execute">
+                    <div class="phase-number">6</div>
+                    <div class="phase-label">Execute</div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <section class="section upload-section" id="uploadSection">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Your Video</h2>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-content">
+                        <i class="fas fa-film upload-icon"></i>
+                        <p class="upload-text">Drag & drop your video here</p>
+                        <p class="upload-subtext">or click to browse</p>
+                        <input type="file" id="fileInput" accept="video/*" hidden>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Select Video
+                        </button>
+                    </div>
+                    <div class="upload-progress" id="uploadProgress" hidden>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">Uploading...</p>
+                    </div>
+                </div>
+                <div class="uploaded-file" id="uploadedFile" hidden>
+                    <i class="fas fa-check-circle"></i>
+                    <span id="uploadedFilename"></span>
+                </div>
+            </section>
+
+            <!-- Phase 1: Prompt Refinement -->
+            <section class="section phase-section" id="phase1Section" hidden>
+                <h2><i class="fas fa-magic"></i> Phase 1: Prompt Refinement</h2>
+                <div class="prompt-input-area">
+                    <label for="originalPrompt">Describe your cinematic vision:</label>
+                    <textarea 
+                        id="originalPrompt" 
+                        class="prompt-textarea" 
+                        placeholder="Example: Make a nice video about my vacation with emotional music..."
+                        rows="4"
+                    ></textarea>
+                    <button class="btn btn-primary" id="refinePromptBtn">
+                        <i class="fas fa-sparkles"></i> Refine Prompt
+                    </button>
+                </div>
+
+                <div class="refinement-result" id="refinementResult" hidden>
+                    <div class="comparison">
+                        <div class="original-prompt">
+                            <h4>Original</h4>
+                            <p id="displayOriginal"></p>
+                        </div>
+                        <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+                        <div class="improved-prompt">
+                            <h4>Improved</h4>
+                            <p id="displayImproved"></p>
+                        </div>
+                    </div>
+
+                    <div class="issues-detected" id="issuesDetected">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Issues Detected</h4>
+                        <ul id="issuesList"></ul>
+                    </div>
+
+                    <div class="improvements-made" id="improvementsMade">
+                        <h4><i class="fas fa-check"></i> Improvements Made</h4>
+                        <ul id="improvementsList"></ul>
+                    </div>
+
+                    <div class="approval-actions">
+                        <button class="btn btn-success" id="approvePromptBtn">
+                            <i class="fas fa-check"></i> Accept & Continue
+                        </button>
+                        <button class="btn btn-secondary" id="revisePromptBtn">
+                            <i class="fas fa-edit"></i> Request Revision
+                        </button>
+                    </div>
+
+                    <div class="revision-area" id="revisionArea" hidden>
+                        <label for="revisionFeedback">What would you like to change?</label>
+                        <textarea 
+                            id="revisionFeedback" 
+                            class="prompt-textarea" 
+                            placeholder="Example: Make it shorter, less technical, more specific about..."
+                            rows="3"
+                        ></textarea>
+                        <button class="btn btn-primary" id="submitRevisionBtn">
+                            <i class="fas fa-redo"></i> Submit Revision
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phase 2: Intelligent Questioning -->
+            <section class="section phase-section" id="phase2Section" hidden>
+                <h2><i class="fas fa-question-circle"></i> Phase 2: Intelligent Questions</h2>
+                <p class="section-description">
+                    Help us understand your vision better by answering these questions.
+                </p>
+                
+                <div class="questions-container" id="questionsContainer">
+                    <!-- Questions will be dynamically inserted here -->
+                </div>
+
+                <div class="questions-actions">
+                    <button class="btn btn-primary" id="submitAnswersBtn" disabled>
+                        <i class="fas fa-paper-plane"></i> Submit Answers & Continue
+                    </button>
+                    <div class="progress-indicator" id="questionsProgress">
+                        <span id="answeredCount">0</span> / <span id="totalQuestions">0</span> answered
+                    </div>
+                </div>
+            </section>
+
+            <!-- Phase 3: Narrative Analysis -->
+            <section class="section phase-section" id="phase3Section" hidden>
+                <h2><i class="fas fa-brain"></i> Phase 3: Narrative Analysis</h2>
+                <div class="narrative-processing" id="narrativeProcessing">
+                    <div class="spinner"></div>
+                    <p>Analyzing narrative structure and emotional progression...</p>
+                    <p class="sub-text">This may take a moment</p>
+                </div>
+                
+                <div class="narrative-summary" id="narrativeSummary" hidden>
+                    <div class="summary-card">
+                        <h4>Narrative Arc</h4>
+                        <p id="narrativeArc"></p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Dominant Tone</h4>
+                        <p id="dominantTone"></p>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Pacing</h4>
+                        <p id="pacingInfo"></p>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="continueToPlanningBtn">
+                        <i class="fas fa-arrow-right"></i> Continue to Scene Planning
+                    </button>
+                </div>
+            </section>
+
+            <!-- Phase 4: Scene Planning -->
+            <section class="section phase-section" id="phase4Section" hidden>
+                <h2><i class="fas fa-film"></i> Phase 4: Cinematic Scene Planning</h2>
+                <div class="scene-planning-processing" id="scenePlanningProcessing">
+                    <div class="spinner"></div>
+                    <p>Director LLM is planning your cinematic sequence...</p>
+                </div>
+
+                <div class="scene-plan" id="scenePlan" hidden>
+                    <div class="plan-header">
+                        <h3 id="planTitle"></h3>
+                        <div class="plan-meta">
+                            <span class="meta-item"><i class="fas fa-palette"></i> <span id="planTheme"></span></span>
+                            <span class="meta-item"><i class="fas fa-expand"></i> <span id="planFormat"></span></span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> <span id="planStyle"></span></span>
+                        </div>
+                    </div>
+
+                    <div class="scenes-timeline" id="scenesTimeline">
+                        <!-- Scenes will be inserted here -->
+                    </div>
+
+                    <div class="plan-actions">
+                        <button class="btn btn-success" id="executePlanBtn">
+                            <i class="fas fa-play"></i> Execute Scene Plan
+                        </button>
+                        <button class="btn btn-secondary" id="exportPlanBtn">
+                            <i class="fas fa-download"></i> Export JSON
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Execution Section -->
+            <section class="section phase-section" id="executeSection" hidden>
+                <h2><i class="fas fa-cogs"></i> Execution</h2>
+                <div class="execution-progress" id="executionProgress">
+                    <div class="progress-item" id="progressCut">
+                        <i class="fas fa-cut"></i>
+                        <span>Video Cuts</span>
+                        <div class="status">Pending</div>
+                    </div>
+                    <div class="progress-item" id="progressVoice">
+                        <i class="fas fa-microphone"></i>
+                        <span>Voice-Over</span>
+                        <div class="status">Pending</div>
+                    </div>
+                    <div class="progress-item" id="progressSubtitles">
+                        <i class="fas fa-closed-captioning"></i>
+                        <span>Subtitles</span>
+                        <div class="status">Pending</div>
+                    </div>
+                    <div class="progress-item" id="progressRender">
+                        <i class="fas fa-video"></i>
+                        <span>Final Render</span>
+                        <div class="status">Pending</div>
+                    </div>
+                </div>
+
+                <div class="execution-complete" id="executionComplete" hidden>
+                    <i class="fas fa-check-circle success-icon"></i>
+                    <h3>Video Edit Complete!</h3>
+                    <p>Your cinematic edit is ready for download.</p>
+                    <button class="btn btn-success btn-large" id="downloadBtn">
+                        <i class="fas fa-download"></i> Download Video
+                    </button>
+                </div>
+            </section>
+
+            <!-- Webhook Configuration Panel -->
+            <section class="section webhook-section" id="webhookSection">
+                <h3><i class="fas fa-bell"></i> Discord Notifications</h3>
+                <div class="webhook-config">
+                    <div class="form-group">
+                        <label for="webhookUrl">Discord Webhook URL</label>
+                        <input 
+                            type="url" 
+                            id="webhookUrl" 
+                            class="form-input" 
+                            placeholder="https://discord.com/api/webhooks/..."
+                        >
+                        <button class="btn btn-small" id="testWebhookBtn">Test</button>
+                    </div>
+                    
+                    <div class="webhook-toggle">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="webhookEnabled">
+                            <span class="toggle-slider"></span>
+                            Enable Notifications
+                        </label>
+                    </div>
+
+                    <div class="event-checkboxes" id="eventCheckboxes">
+                        <h4>Notify on Events:</h4>
+                        <!-- Event checkboxes will be generated by JS -->
+                    </div>
+
+                    <button class="btn btn-primary" id="saveWebhookBtn">
+                        <i class="fas fa-save"></i> Save Configuration
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Chat/Context Panel -->
+        <aside class="chat-panel" id="chatPanel">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i>
+                <span>Conversation</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                    <p>Welcome to AI Cinematic Video Editor Pro. Upload a video to get started.</p>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
