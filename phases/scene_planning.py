@@ -23,6 +23,7 @@ JSON ESTRICTO, sin texto adicional.
 """
 
 import json
+import ollama
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 from models.schemas import ScenePlanningOutput, Scene, VoiceOver, Subtitles, VideoFormat
@@ -298,9 +299,46 @@ IMPORTANTE: Responde UNICAMENTE con el JSON valido. Sin texto adicional antes o 
     def generate_plan(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Main scene planning method.
-        
-        Returns strict JSON matching ScenePlanningOutput schema.
+        Uses Ollama for AI-driven planning if available, otherwise falls back to rule-based.
         """
+        try:
+            # Prepare prompt for Ollama
+            solicitud = inputs.get('solicitud', '')
+            transcripcion = inputs.get('transcripcion', {})
+            visuales = inputs.get('visuales', {})
+            narrative = inputs.get('narrative', {})
+            
+            prompt = f"""
+[SOLICITUD]: {solicitud}
+[TRANSCRIPCIÓN]: {json.dumps(transcripcion)}
+[VISUALES]: {json.dumps(visuales)}
+[NARRATIVA]: {json.dumps(narrative)}
+"""
+            
+            print("Attempting to generate plan using Ollama...")
+            response = ollama.chat(
+                model='llama3',
+                messages=[
+                    {"role": "system", "content": self.director_system_prompt},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            content = response['message']['content']
+            start_idx = content.find('{')
+            end_idx = content.rfind('}') + 1
+            if start_idx != -1 and end_idx != 0:
+                json_str = content[start_idx:end_idx]
+                return json.loads(json_str)
+            else:
+                raise ValueError("No JSON found in Ollama response")
+                
+        except Exception as e:
+            print(f"Ollama planning failed or not available: {e}. Falling back to rule-based planning.")
+            return self._generate_fallback_plan(inputs)
+
+    def _generate_fallback_plan(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """Original rule-based planning logic as a fallback"""
         answers = inputs.get('answers', {})
         narrative = inputs.get('narrative', {})
         
