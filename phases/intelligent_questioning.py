@@ -17,6 +17,8 @@ Possible topics:
 Do NOT continue until enough answers are collected.
 """
 
+import json
+import ollama
 from typing import List, Dict, Any, Optional
 from models.schemas import Question, QuestioningOutput
 
@@ -24,7 +26,8 @@ from models.schemas import Question, QuestioningOutput
 class IntelligentQuestioning:
     """Phase 2: Generate intelligent questions to gather missing information"""
 
-    def __init__(self):
+    def __init__(self, model_name: str = "llama3"):
+        self.model_name = model_name
         self.question_templates = {
             'format': {
                 'id': 'video_format',
@@ -299,6 +302,72 @@ class IntelligentQuestioning:
                 processed[key] = value
         
         return processed
+
+    def generate_dynamic_questions(self, prompt: str, transcription: Dict, 
+                                 visual_analysis: Dict, existing_answers: Dict[str, Any]) -> List[Question]:
+        """
+        Generate dynamic, context-aware questions using Ollama based on 
+        video content and user request.
+        """
+        
+        system_prompt = """ERES UN ASISTENTE DE EDICIÓN DE VIDEO PROFESIONAL.
+Tu tarea es generar preguntas inteligentes para el usuario basándote en su solicitud y el contenido del video (transcripción y visuales).
+
+REGLAS:
+1. Genera entre 3 y 5 preguntas RELEVANTES.
+2. Si ya hay información en el prompt o en las respuestas existentes, NO vuelvas a preguntar lo mismo.
+3. Las preguntas deben ayudar a definir el estilo, ritmo, formato o intención del video.
+4. Formato de salida: JSON ESTRICTO (una lista de objetos que sigan el esquema definido).
+
+ESQUEMA DE PREGUNTA:
+{
+  "id": "string único",
+  "category": "format|platform|duration|rhythm|tone|music|voice_over|subtitles|style",
+  "question": "texto de la pregunta",
+  "type": "single_choice|multiple_choice|text|number",
+  "options": ["opción 1", "opción 2"] (solo si es choice),
+  "required": true/false,
+  "help_text": "explicación breve"
+}
+
+Responde SOLO con el JSON."""
+
+        user_input = f"""
+[PROMPT DEL USUARIO]: {prompt}
+[TRANSCRIPCIÓN DEL VIDEO]: {json.dumps(transcription)}
+[ANÁLISIS VISUAL]: {json.dumps(visual_analysis)}
+[RESPUESTAS EXISTENTES]: {json.dumps(existing_answers)}
+"""
+
+        try:
+            response = ollama.chat(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_input}
+                ]
+            )
+            
+            content = response['message']['content']
+            
+            # Robust JSON extraction
+            start_idx = content.find('[')
+            end_idx = content.rfind(']') + 1
+            
+            if start_idx != -1 and end_idx != 0:
+                questions_data = json.loads(content[start_idx:end_idx])
+                questions = []
+                for q_data in questions_data:
+                    questions.append(Question(**q_data))
+                return questions
+            else:
+                # Fallback to templates if no JSON found
+                print("No JSON found in Ollama response for questions. Falling back to templates.")
+                return self.generate_questions(prompt, existing_answers)
+                
+        except Exception as e:
+            print(f"Error generating dynamic questions: {e}. Falling back to templates.")
+            return self.generate_questions(prompt, existing_answers)
 
 
 # Example usage
