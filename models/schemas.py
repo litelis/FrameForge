@@ -3,7 +3,10 @@ Pydantic models for strict JSON validation
 All outputs must conform to these schemas
 """
 from __future__ import annotations
-from pydantic import BaseModel, Field, validator
+try:
+    from pydantic.v1 import BaseModel, Field, validator
+except ImportError:
+    from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any, Literal
 from enum import Enum
 
