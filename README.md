@@ -208,9 +208,9 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 
 ## 🛠️ Stack Tecnológico
 
-- **Backend:** Python 3.11, Flask 2.3.3, Flask-SocketIO 5.3.6
+- **Backend:** Python 3.12+, Flask 2.3.3, Flask-SocketIO 5.3.6
 - **Validación:** Pydantic 1.10.12
-- **Async:** aiohttp 3.8.5
+- **Async:** aiohttp 3.10.11+ (compatible con Python 3.12)
 - **Frontend:** HTML5, CSS3, JavaScript ES6+
 - **Tiempo Real:** Socket.IO
 - **Webhooks:** Discord API
@@ -234,6 +234,25 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 3. Commit tus cambios: `git commit -am 'Añade nueva feature'`
 4. Push a la rama: `git push origin feature/nueva-feature`
 5. Abre un Pull Request
+
+---
+
+## 🛠️ Solución de Problemas
+
+### Error: `The Werkzeug web server is not designed to run in production`
+
+Si al iniciar `app.py` encuentras este error:
+`RuntimeError: The Werkzeug web server is not designed to run in production. Pass allow_unsafe_werkzeug=True to the run() method to disable this error.`
+
+**Solución:** Este error ha sido corregido en la versión actual de `app.py` mediante el parámetro `allow_unsafe_werkzeug=True`. Si persiste, asegúrate de estar en un entorno de desarrollo.
+
+### Error: `ModuleNotFoundError: No module named 'requests'`
+
+**Solución:** Ejecuta `pip install requests` o instala todas las dependencias con `pip install -r requirements.txt`.
+
+### Problemas con `aiohttp` en Python 3.12
+
+**Solución:** Asegúrate de instalar `aiohttp>=3.10.11`. En este repositorio hemos actualizado el `requirements.txt` para garantizar compatibilidad total.
 
 ---
 

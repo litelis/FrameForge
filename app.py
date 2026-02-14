@@ -881,4 +881,6 @@ if __name__ == '__main__':
     print("Starting server on http://localhost:5000")
     print("=" * 60)
     
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # allow_unsafe_werkzeug=True is needed when running the development server
+    # with recent versions of Werkzeug and Flask-SocketIO
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
