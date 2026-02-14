@@ -4,8 +4,11 @@
 
 - **Python 3.8 o superior** (descargar desde https://www.python.org/downloads/)
 - **Git** (descargar desde https://git-scm.com/downloads/)
-- **2GB de espacio libre** en disco
-- **Conexión a internet** (para descargar dependencias)
+- **FFmpeg** (Procesamiento de video/audio - descargar desde https://ffmpeg.org/)
+- **Ollama** (Motor de IA local - descargar desde https://ollama.com/)
+- **10GB+ de espacio libre** en disco (para modelos de IA)
+- **GPU (Recomendado)**: NVIDIA con CUDA para mejor rendimiento
+- **Conexión a internet** (para descargar dependencias y modelos)
 
 ---
 
@@ -36,6 +39,14 @@ El script `setup.py` hará automáticamente:
 
 ```bash
 python app.py
+```
+
+### Paso 7: IA Local Standalone (Opcional)
+
+Si quieres usar el motor de edición directo:
+
+```bash
+python ai_editor.py video.mp4 "Request"
 ```
 
 Abre tu navegador en: **http://localhost:5000**
