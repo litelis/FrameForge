@@ -5,7 +5,10 @@ Ensures all outputs conform to strict Pydantic schemas
 """
 
 from typing import Type, Dict, Any, TypeVar
-from pydantic import BaseModel, ValidationError
+try:
+    from pydantic.v1 import BaseModel, ValidationError
+except ImportError:
+    from pydantic import BaseModel, ValidationError
 import logging
 
 logger = logging.getLogger(__name__)
