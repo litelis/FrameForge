@@ -2,7 +2,7 @@
 Pydantic models for strict JSON validation
 All outputs must conform to these schemas
 """
-
+from __future__ import annotations
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any, Literal
 from enum import Enum
@@ -89,26 +89,11 @@ class PromptRefinementOutput(BaseModel):
       "user_action_required": "accept | revise"
     }
     """
-    original_prompt: str = Field(
-        ..., 
-        description="The user's original prompt, unchanged"
-    )
-    improved_prompt: str = Field(
-        ..., 
-        description="Improved version with same intent, better clarity"
-    )
-    issues_detected: List[str] = Field(
-        default_factory=list,
-        description="List of ambiguities, missing constraints, or vague language found"
-    )
-    improvements_made: List[str] = Field(
-        default_factory=list,
-        description="List of specific improvements applied"
-    )
-    user_action_required: Literal["accept", "revise"] = Field(
-        ...,
-        description="Whether user should accept or request revision"
-    )
+    original_prompt: str = Field(default=..., description="The user's original prompt, unchanged")
+    improved_prompt: str = Field(default=..., description="Improved version with same intent, better clarity")
+    issues_detected: List[str] = Field(default_factory=list, description="List of ambiguities, missing constraints, or vague language found")
+    improvements_made: List[str] = Field(default_factory=list, description="List of specific improvements applied")
+    user_action_required: Literal["accept", "revise"] = Field(default=..., description="Whether user should accept or request revision")
     
     @validator('improved_prompt')
     def improved_not_empty(cls, v):
@@ -126,28 +111,13 @@ class PromptRefinementOutput(BaseModel):
 
 class Question(BaseModel):
     """Single question structure"""
-    id: str = Field(..., description="Unique question identifier")
-    category: str = Field(
-        ..., 
-        description="Category: format, platform, duration, rhythm, tone, music, voice_over, subtitles, ending"
-    )
-    question: str = Field(..., description="The question text")
-    type: Literal["single_choice", "multiple_choice", "text", "number"] = Field(
-        ..., 
-        description="Type of answer expected"
-    )
-    options: Optional[List[str]] = Field(
-        default=None,
-        description="Options for choice-based questions"
-    )
-    required: bool = Field(
-        default=True,
-        description="Whether this question must be answered"
-    )
-    help_text: Optional[str] = Field(
-        default=None,
-        description="Additional context or examples"
-    )
+    id: str = Field(default=..., description="Unique question identifier")
+    category: str = Field(default=..., description="Category: format, platform, duration, rhythm, tone, music, voice_over, subtitles, ending")
+    question: str = Field(default=..., description="The question text")
+    type: Literal["single_choice", "multiple_choice", "text", "number"] = Field(default=..., description="Type of answer expected")
+    options: Optional[List[str]] = Field(default=None, description="Options for choice-based questions")
+    required: bool = Field(default=True, description="Whether this question must be answered")
+    help_text: Optional[str] = Field(default=None, description="Additional context or examples")
 
 class QuestioningOutput(BaseModel):
     """
@@ -251,7 +221,7 @@ class Scene(BaseModel):
       "transition": ""
     }
     """
-    scene_id: int = Field(..., description="Sequential scene identifier")
+    scene_id: int = Field(default=..., description="Sequential scene identifier")
     goal: str = Field(
         ..., 
         description="Emotional + narrative goal of this scene"
@@ -384,10 +354,10 @@ class WebhookMessage(BaseModel):
     """
     Structure for Discord webhook messages
     """
-    project_id: str = Field(..., description="Project/session identifier")
-    phase: str = Field(..., description="Current phase")
-    status: str = Field(..., description="Short status description")
-    timestamp: str = Field(..., description="ISO timestamp")
+    project_id: str = Field(default=..., description="Project/session identifier")
+    phase: str = Field(default=..., description="Current phase")
+    status: str = Field(default=..., description="Short status description")
+    timestamp: str = Field(default=..., description="ISO timestamp")
     details: Optional[Dict[str, Any]] = Field(
         default=None,
         description="Additional event-specific details"
@@ -434,3 +404,16 @@ class APIResponse(BaseModel):
     message: Optional[str] = None
     data: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
+
+# Update forward references for Python 3.12 compatibility in Pydantic v1
+PromptRefinementOutput.update_forward_refs()
+Question.update_forward_refs()
+QuestioningOutput.update_forward_refs()
+NarrativeAnalysis.update_forward_refs()
+VoiceOver.update_forward_refs()
+Subtitles.update_forward_refs()
+Scene.update_forward_refs()
+ScenePlanningOutput.update_forward_refs()
+WebhookConfig.update_forward_refs()
+WebhookMessage.update_forward_refs()
+APIResponse.update_forward_refs()
