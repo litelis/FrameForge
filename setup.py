@@ -51,7 +51,7 @@ REQUIRED_PACKAGES = {
     'socketio': 'python-socketio>=5.8.0',
     'requests': 'requests>=2.28.0',
     'werkzeug': 'werkzeug>=2.3.0',
-    'python_dotenv': 'python-dotenv>=1.0.0',
+    'dotenv': 'python-dotenv>=1.0.0',
 }
 
 OPTIONAL_PACKAGES = {
