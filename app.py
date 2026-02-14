@@ -21,6 +21,7 @@ from phases.narrative_reasoning import NarrativeReasoning
 from phases.scene_planning import ScenePlanning
 
 # Import utilities
+from utils.video_processor import AudioAnalysis, VisualAnalysis
 from utils.webhook import WebhookNotifier
 from utils.validators import validate_json_schema
 from models.schemas import (
@@ -52,6 +53,10 @@ prompt_refiner = PromptRefiner()
 intelligent_questioning = IntelligentQuestioning()
 narrative_reasoning = NarrativeReasoning()
 scene_planning = ScenePlanning()
+
+# Initialize video processors
+audio_analysis_engine = AudioAnalysis()
+visual_analysis_engine = VisualAnalysis()
 
 # Initialize webhook notifier
 webhook_notifier = WebhookNotifier()
@@ -385,9 +390,16 @@ def phase2_generate_questions():
     try:
         final_prompt = session['data'].get('final_prompt')
         existing_answers = session['data'].get('phase2_answers', {})
+        transcription = session.get('transcription', {})
+        visual_analysis = session.get('visual_analysis', {})
         
-        # Generate questions
-        questions = intelligent_questioning.generate_questions(final_prompt, existing_answers)
+        # Generate questions (now dynamic using Ollama, Whisper and CLIP context)
+        questions = intelligent_questioning.generate_dynamic_questions(
+            final_prompt, 
+            transcription, 
+            visual_analysis, 
+            existing_answers
+        )
         
         # Convert Question objects to dictionaries for JSON serialization
         questions_dict = [q.dict() for q in questions]
@@ -629,13 +641,13 @@ def start_transcription():
             {'video': session['video_path']}
         ))
     
-    # TODO: Implement actual transcription logic
-    # For now, return mock data
-    session['transcription'] = {
-        'segments': [],
-        'full_text': '',
-        'language': 'es'
-    }
+    try:
+        # Perform actual transcription using Whisper
+        result = audio_analysis_engine.transcribe(session['video_path'])
+        session['transcription'] = result
+    except Exception as e:
+        logger.error(f"Transcription error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
     
     if session.get('webhook_config'):
         asyncio.run(webhook_notifier.notify(
@@ -676,12 +688,21 @@ def start_visual_analysis():
             {}
         ))
     
-    # TODO: Implement actual visual analysis
-    session['visual_analysis'] = {
-        'scenes': [],
-        'key_frames': [],
-        'visual_quality': {}
-    }
+    try:
+        # Perform actual visual analysis using CLIP
+        # We can extract potential concepts from the prompt later, 
+        # but for now we use defaults or some from the prompt
+        prompt = session['data'].get('final_prompt', '')
+        # Simple extraction of words from prompt as search concepts
+        additional_concepts = [w for w in prompt.split() if len(w) > 4][:5]
+        default_concepts = ["nature", "city", "people", "action", "emotional", "cinematic", "interview"]
+        search_concepts = list(set(default_concepts + additional_concepts))
+        
+        result = visual_analysis_engine.analyze_video(session['video_path'], search_concepts=search_concepts)
+        session['visual_analysis'] = result
+    except Exception as e:
+        logger.error(f"Visual analysis error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
     
     if session.get('webhook_config'):
         asyncio.run(webhook_notifier.notify(
